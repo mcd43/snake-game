@@ -4,6 +4,13 @@ import time
 
 snake_body = []
 
+def highscore():
+  scores = open("scorehistorysnake.txt", "r")
+  data = scores.readlines()
+  return max(data) 
+
+hs = highscore()
+
 window = turtle.Screen()
 window.bgcolor("Black")
 w = 1200
@@ -29,9 +36,9 @@ scoreboard = turtle.Turtle()
 scoreboard.color("White")
 scoreboard.penup()
 scoreboard.hideturtle()
-scoreboard.goto(-550,325)
+scoreboard.goto(-550,275)
 FONT = ("Arial",20,"normal")
-scoreboard.write("SCORE: ",font = FONT)
+scoreboard.write("SCORE: "+ "\nHIGHSCORE: " + hs,font = FONT)
 scoreboard.goto(-425,325)
 scoreboard.goto(-425,325)
 
@@ -82,9 +89,10 @@ def checkbounds():
   if x <= -600:
     snake.setx(w/2)
 
-def updatescore(score):
+def updatescore(score, hs):
   scoreboard.undo()
   scoreboard.write(score, font = FONT)
+  
 
 def growsnake():
   body = turtle.Turtle()
@@ -113,34 +121,38 @@ def showallsnake():
         snake_body[0].goto(x,y)
 
 def checkdeath():
-  for i in range(len(snake_body)- 1, 0, -1):
-    if snake_body[i].distance(snake) < 5:
-      return False
-    return True
+  if len(snake_body) > 1:
+    for i in range(len(snake_body)- 1, 1, -1):
+      print(snake_body[i].distance(snake))
+      if snake_body[i].distance(snake) == 0.0:
+        return False
+  return True
+
+
 
 
 def main():
-    score = 0
-    print(type(score))
-    window.listen()
-    window.onkey(moveup,"w")
-    window.onkey(movedown,"s")
-    window.onkey(moveright,"d")
-    window.onkey(moveleft,"a")
-    snake_body.append(snake)
-    rungame = True
-    while rungame:
-        window.update()
-        move()
-        checkbounds()
-        time.sleep(0.04)
-        score = checkcollision(score)
-        showallsnake()
-        rungame = checkdeath()
-        updatescore(score)
-    scorefile = open("scorehistorysnake.txt","w")
-    scorefile.write("Game Score: " + str(score))
-    scorefile.close()
+  score = 0
+  window.listen()
+  window.onkeypress(moveup,"w")
+  window.onkeypress(movedown,"s")
+  window.onkeypress(moveright,"d")
+  window.onkeypress(moveleft,"a")
+  snake_body.append(snake)
+  rungame = False
+  while rungame:
+      window.update()
+      move()
+      checkbounds()
+      time.sleep(0.04)
+      score = checkcollision(score)
+      showallsnake()
+      # rungame = checkdeath()
+      updatescore(score, hs)
+  scorefile = open("scorehistorysnake.txt","a")
+  scorefile.write("\n" + str(score))
+  scorefile.close()
+  turtle.mainloop()
 
-  
+
 main()
